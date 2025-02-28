@@ -25,6 +25,8 @@ export default function Login() {
         const user = users.find((user) => user.email === email && user.password === password);
         if (user) {
           // Manejar la respuesta exitosa aquí (por ejemplo, redirigir al usuario)
+          //guaradar en el local storage el rol del usuario
+          localStorage.setItem("role", user.role);
           router.push("/pages/dashboard");
         } else {
           setError("Credenciales incorrectas. Por favor, verifica tu correo electrónico y contraseña.");

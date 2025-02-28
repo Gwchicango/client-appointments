@@ -6,6 +6,7 @@ import ConfirmModal from '@/app/(components)/ConfirmModal';
 import GenericTable from '@/app/(components)/GenericTable';
 import { doctorApi, Doctor } from './doctorApi';
 import Link from 'next/link';
+import ProtectedRoute from '@/app/(components)/ProtectedRoute';
 
 const DoctorListPage: React.FC = () => {
   const [doctors, setDoctors] = useState<Doctor[]>([]);
@@ -76,47 +77,49 @@ const DoctorListPage: React.FC = () => {
   ];
 
   return (
-    <PageTemplate loading={loading}>
-      <div className="bg-white p-6 rounded-lg shadow-lg mb-6">
-        <div className="flex justify-between items-center mb-4">
-          <div>
-            <h2 className="text-2xl font-bold">Lista de Doctores</h2>
-            <p>Aquí puedes encontrar una lista de todos los doctores registrados en el sistema.</p>
+    <ProtectedRoute allowedRoles={['ADMIN', 'PATIENT']}>
+      <PageTemplate loading={loading}>
+        <div className="bg-white p-6 rounded-lg shadow-lg mb-6">
+          <div className="flex justify-between items-center mb-4">
+            <div>
+              <h2 className="text-2xl font-bold">Lista de Doctores</h2>
+              <p>Aquí puedes encontrar una lista de todos los doctores registrados en el sistema.</p>
+            </div>
+            <Link href="doctor/create" className="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors">
+              Añadir Nuevo Doctor
+            </Link>
           </div>
-          <Link href="doctor/create" className="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors">
-            Añadir Nuevo Doctor
-          </Link>
         </div>
-      </div>
-      <div className="bg-white p-6 rounded-lg shadow-lg">
-        <GenericTable
-          data={doctors}
-          columns={columns}
-          actions={(doctor) => (
-            <>
-              <Link href={`doctor/edit/?id=${doctor.id}`}>
-                <span className="bg-yellow-500 text-white py-1 px-2 rounded-lg hover:bg-yellow-600 transition-colors cursor-pointer">
-                  Editar
-                </span>
-              </Link>
-              <button
-                onClick={() => openModal(doctor.id)}
-                className="bg-red-500 text-white py-1 px-2 rounded-lg hover:bg-red-600 transition-colors"
-              >
-                Eliminar
-              </button>
-            </>
-          )}
+        <div className="bg-white p-6 rounded-lg shadow-lg">
+          <GenericTable
+            data={doctors}
+            columns={columns}
+            actions={(doctor) => (
+              <>
+                <Link href={`doctor/edit/?id=${doctor.id}`}>
+                  <span className="bg-yellow-500 text-white py-1 px-2 rounded-lg hover:bg-yellow-600 transition-colors cursor-pointer">
+                    Editar
+                  </span>
+                </Link>
+                <button
+                  onClick={() => openModal(doctor.id)}
+                  className="bg-red-500 text-white py-1 px-2 rounded-lg hover:bg-red-600 transition-colors"
+                >
+                  Eliminar
+                </button>
+              </>
+            )}
+          />
+        </div>
+        <ConfirmModal
+          isOpen={isModalOpen}
+          onClose={closeModal}
+          onConfirm={confirmDelete}
+          title="Confirmar Eliminación"
+          message="¿Estás seguro de que deseas eliminar este doctor?"
         />
-      </div>
-      <ConfirmModal
-        isOpen={isModalOpen}
-        onClose={closeModal}
-        onConfirm={confirmDelete}
-        title="Confirmar Eliminación"
-        message="¿Estás seguro de que deseas eliminar este doctor?"
-      />
-    </PageTemplate>
+      </PageTemplate>
+    </ProtectedRoute>
   );
 };
 

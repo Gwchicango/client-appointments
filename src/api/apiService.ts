@@ -49,7 +49,6 @@ const getAuthToken = async (): Promise<string | null> => {
       },
     });
     const data = response.data as { access_token: string };
-    console.log("Token fetched: ", data.access_token);
     return data.access_token;
   } catch (error) {
     console.error("Error fetching auth token", error);
@@ -77,12 +76,18 @@ const addAuthInterceptor = (instance: any) => {
       }
       config.headers.Authorization = `Bearer ${access_token}`;
     }
-    console.log("Request config: ", config);
     return config;
   });
 };
 
 addAuthInterceptor(axiosInstance);
+
+//metdo redirigir al login y borrar el token del localstorage
+const redirectToLogin = () => {
+  localStorage.removeItem("access_token");
+  localStorage.removeItem("role");
+  window.location.href = "/auth/login";
+};
 
 
 /**
@@ -100,6 +105,7 @@ const createApiService = (instance: any) => ({
     } catch (error) {
       const axiosError = error as any;
       if (axiosError.response?.status === 401) {
+        redirectToLogin();
         return {
           data: null,
           status: 401,
@@ -133,6 +139,7 @@ const createApiService = (instance: any) => ({
     } catch (error) {
       const axiosError = error as any;
       if (axiosError.response?.status === 401) {
+        redirectToLogin();
         return {
           data: null,
           status: 401,
@@ -166,6 +173,7 @@ const createApiService = (instance: any) => ({
     } catch (error) {
       const axiosError = error as any;
       if (axiosError.response?.status === 401) {
+        redirectToLogin();
         return {
           data: null,
           status: 401,
@@ -199,6 +207,7 @@ const createApiService = (instance: any) => ({
     } catch (error) {
       const axiosError = error as any;
       if (axiosError.response?.status === 401) {
+        redirectToLogin();
         return {
           data: null,
           status: 401,
@@ -232,6 +241,7 @@ const createApiService = (instance: any) => ({
     } catch (error) {
       const axiosError = error as any;
       if (axiosError.response?.status === 401) {
+        redirectToLogin();
         return {
           data: null,
           status: 401,

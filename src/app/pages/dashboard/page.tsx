@@ -7,6 +7,7 @@ import { doctorApi, Doctor } from '@/app/pages/doctor/doctorApi';
 import { userApi, User } from '@/app/pages/client/clientApi';
 import { appointmentApi, Appointment } from '@/app/pages/appointments/appointmentsApi';
 import GenericTable from '@/app/(components)/GenericTable';
+import ProtectedRoute from '@/app/(components)/ProtectedRoute';
 
 const DashboardPage: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
@@ -14,6 +15,8 @@ const DashboardPage: React.FC = () => {
   const [clients, setClients] = useState<User[]>([]);
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [activeTab, setActiveTab] = useState<string>("doctors");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -42,7 +45,7 @@ const DashboardPage: React.FC = () => {
           setError(appointmentResponse.statusText);
         }
       } catch (err) {
-        setError('Error fetching data');
+        setError('Error al obtener los datos');
       } finally {
         setLoading(false);
       }
@@ -50,6 +53,28 @@ const DashboardPage: React.FC = () => {
 
     fetchData();
   }, []);
+
+  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(event.target.value);
+  };
+
+  const filteredDoctors = doctors.filter(doctor =>
+    doctor.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    doctor.lastname.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    doctor.email.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const filteredClients = clients.filter(client =>
+    client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    client.lastname.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    client.email.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const filteredAppointments = appointments.filter(appointment =>
+    appointment.idPatient.toString().includes(searchTerm.toLowerCase()) ||
+    appointment.idDoctor.toString().includes(searchTerm.toLowerCase()) ||
+    appointment.date.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   const doctorColumns: { key: keyof Doctor; label: string }[] = [
     { key: 'id', label: 'ID' },
@@ -78,41 +103,72 @@ const DashboardPage: React.FC = () => {
   ];
 
   return (
-    <PageTemplate loading={loading}>
-      <div className="bg-white p-6 rounded-lg shadow-lg mb-6">
-        <h2 className="text-2xl font-bold mb-4">Welcome to the Dashboard!</h2>
-        <p className="mb-4">Here you can find an overview of your activities and statistics.</p>
-      </div>
-      <div className="space-y-4 text-black">
-        <div className="bg-blue-500 p-4 rounded-lg shadow-lg">
-          <div className="flex items-center mb-4">
-            <FaUserMd className="text-4xl mr-4" />
-            <h3 className="text-xl font-bold">Doctores</h3>
-          </div>
-          <div>
-            <GenericTable data={doctors} columns={doctorColumns} />
-          </div>
+    <ProtectedRoute allowedRoles={['ADMIN','PATIENT']}>
+      <PageTemplate loading={loading}>
+        <div className="bg-white p-6 rounded-lg shadow-lg mb-6">
+          <h2 className="text-2xl font-bold mb-4">¡Bienvenido al Panel de Control!</h2>
+          <p className="mb-4">Aquí puedes encontrar un resumen de tus actividades y estadísticas.</p>
         </div>
-        <div className="bg-green-500  p-4 rounded-lg shadow-lg">
-          <div className="flex items-center mb-4">
-            <FaUsers className="text-4xl mr-4" />
-            <h3 className="text-xl font-bold">Clientes</h3>
+        <div className="bg-white p-4 rounded-lg shadow-lg mb-6">
+          <div className="flex space-x-4 mb-4">
+            <button
+              className={`px-4 py-2 rounded-lg ${activeTab === 'doctors' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
+              onClick={() => setActiveTab('doctors')}
+            >
+              Doctores
+            </button>
+            <button
+              className={`px-4 py-2 rounded-lg ${activeTab === 'clients' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
+              onClick={() => setActiveTab('clients')}
+            >
+              Clientes
+            </button>
+            <button
+              className={`px-4 py-2 rounded-lg ${activeTab === 'appointments' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
+              onClick={() => setActiveTab('appointments')}
+            >
+              Citas
+            </button>
           </div>
-          <div>
-            <GenericTable data={clients} columns={clientColumns} />
-          </div>
+          {activeTab === 'doctors' && (
+            <div>
+              <input
+                type="text"
+                placeholder="Buscar doctores..."
+                value={searchTerm}
+                onChange={handleSearch}
+                className="w-full p-2 border border-gray-300 rounded-lg mb-4"
+              />
+              <GenericTable data={filteredDoctors} columns={doctorColumns} />
+            </div>
+          )}
+          {activeTab === 'clients' && (
+            <div>
+              <input
+                type="text"
+                placeholder="Buscar clientes..."
+                value={searchTerm}
+                onChange={handleSearch}
+                className="w-full p-2 border border-gray-300 rounded-lg mb-4"
+              />
+              <GenericTable data={filteredClients} columns={clientColumns} />
+            </div>
+          )}
+          {activeTab === 'appointments' && (
+            <div>
+              <input
+                type="text"
+                placeholder="Buscar citas..."
+                value={searchTerm}
+                onChange={handleSearch}
+                className="w-full p-2 border border-gray-300 rounded-lg mb-4"
+              />
+              <GenericTable data={filteredAppointments} columns={appointmentColumns} />
+            </div>
+          )}
         </div>
-        <div className="bg-red-500 p-4 rounded-lg shadow-lg">
-          <div className="flex items-center mb-4">
-            <FaCalendarAlt className="text-4xl mr-4" />
-            <h3 className="text-xl font-bold">Citas</h3>
-          </div>
-          <div>
-            <GenericTable data={appointments} columns={appointmentColumns} />
-          </div>
-        </div>
-      </div>
-    </PageTemplate>
+      </PageTemplate>
+    </ProtectedRoute>
   );
 };
 
