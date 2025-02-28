@@ -14,6 +14,7 @@ const DoctorListPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [selectedDoctorId, setSelectedDoctorId] = useState<number | null>(null);
+  const role = localStorage.getItem('role');
 
   useEffect(() => {
     const fetchDoctors = async () => {
@@ -85,16 +86,18 @@ const DoctorListPage: React.FC = () => {
               <h2 className="text-2xl font-bold">Lista de Doctores</h2>
               <p>Aquí puedes encontrar una lista de todos los doctores registrados en el sistema.</p>
             </div>
-            <Link href="doctor/create" className="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors">
-              Añadir Nuevo Doctor
-            </Link>
+            {role === 'ADMIN' && (
+              <Link href="doctor/create" className="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors">
+                Añadir Nuevo Doctor
+              </Link>
+            )}
           </div>
         </div>
         <div className="bg-white p-6 rounded-lg shadow-lg">
           <GenericTable
             data={doctors}
             columns={columns}
-            actions={(doctor) => (
+            actions={role === 'ADMIN' ? (doctor) => (
               <>
                 <Link href={`doctor/edit/?id=${doctor.id}`}>
                   <span className="bg-yellow-500 text-white py-1 px-2 rounded-lg hover:bg-yellow-600 transition-colors cursor-pointer">
@@ -108,7 +111,7 @@ const DoctorListPage: React.FC = () => {
                   Eliminar
                 </button>
               </>
-            )}
+            ) : undefined}
           />
         </div>
         <ConfirmModal

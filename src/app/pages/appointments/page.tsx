@@ -10,7 +10,6 @@ import { userApi, User } from '@/app/pages/client/clientApi';
 import Link from 'next/link';
 import ProtectedRoute from '@/app/(components)/ProtectedRoute';
 
-
 const AppointmentListPage: React.FC = () => {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [doctors, setDoctors] = useState<Doctor[]>([]);
@@ -19,6 +18,8 @@ const AppointmentListPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [selectedAppointmentId, setSelectedAppointmentId] = useState<number | null>(null);
+  const role = localStorage.getItem('role');
+  const userId = Number(localStorage.getItem('idUser'));
 
   useEffect(() => {
     const fetchData = async () => {
@@ -30,7 +31,11 @@ const AppointmentListPage: React.FC = () => {
         ]);
 
         if (appointmentResponse.status === 200 && appointmentResponse.data) {
-          setAppointments(appointmentResponse.data);
+          let fetchedAppointments = appointmentResponse.data;
+          if (role === 'PATIENT') {
+            fetchedAppointments = fetchedAppointments.filter((appointment: Appointment) => appointment.idPatient === userId);
+          }
+          setAppointments(fetchedAppointments);
         } else {
           setError(appointmentResponse.statusText);
         }
@@ -54,7 +59,7 @@ const AppointmentListPage: React.FC = () => {
     };
 
     fetchData();
-  }, []);
+  }, [role, userId]);
 
   const handleDelete = async (id: number) => {
     try {
@@ -121,9 +126,9 @@ const AppointmentListPage: React.FC = () => {
               <h2 className="text-2xl font-bold">Lista de Citas</h2>
               <p>Aquí puedes encontrar una lista de todas las citas registradas en el sistema.</p>
             </div>
-            <Link href="appointments/create" className="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors">
-              Añadir Nueva Cita
-            </Link>
+              <Link href="appointments/create" className="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors">
+                Añadir Nueva Cita
+              </Link>
           </div>
         </div>
         <div className="bg-white p-6 rounded-lg shadow-lg">
@@ -141,7 +146,7 @@ const AppointmentListPage: React.FC = () => {
                   onClick={() => openModal(appointment.id)}
                   className="bg-red-500 text-white py-1 px-2 rounded-lg hover:bg-red-600 transition-colors ml-2"
                 >
-                  Eliminar
+                  Cancelar
                 </button>
               </>
             )}
@@ -151,8 +156,8 @@ const AppointmentListPage: React.FC = () => {
           isOpen={isModalOpen}
           onClose={closeModal}
           onConfirm={confirmDelete}
-          title="Confirmar Eliminación"
-          message="¿Estás seguro de que deseas eliminar esta cita?"
+          title="Confirmar Cancelación"
+          message="¿Estás seguro de que deseas cancelar esta cita?"
         />
       </PageTemplate>
     </ProtectedRoute>

@@ -27,6 +27,7 @@ export default function Login() {
           // Manejar la respuesta exitosa aquí (por ejemplo, redirigir al usuario)
           //guaradar en el local storage el rol del usuario
           localStorage.setItem("role", user.role);
+          localStorage.setItem("idUser", user.id.toString())
           router.push("/pages/dashboard");
         } else {
           setError("Credenciales incorrectas. Por favor, verifica tu correo electrónico y contraseña.");
