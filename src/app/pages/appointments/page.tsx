@@ -8,6 +8,8 @@ import { appointmentApi, Appointment } from './appointmentsApi';
 import { doctorApi, Doctor } from '@/app/pages/doctor/doctorApi';
 import { userApi, User } from '@/app/pages/client/clientApi';
 import Link from 'next/link';
+import ProtectedRoute from '@/app/(components)/ProtectedRoute';
+
 
 const AppointmentListPage: React.FC = () => {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
@@ -111,47 +113,49 @@ const AppointmentListPage: React.FC = () => {
   }));
 
   return (
-    <PageTemplate loading={loading}>
-      <div className="bg-white p-6 rounded-lg shadow-lg mb-6">
-        <div className="flex justify-between items-center mb-4">
-          <div>
-            <h2 className="text-2xl font-bold">Lista de Citas</h2>
-            <p>Aquí puedes encontrar una lista de todas las citas registradas en el sistema.</p>
+    <ProtectedRoute allowedRoles={['ADMIN', 'PATIENT']}>
+      <PageTemplate loading={loading}>
+        <div className="bg-white p-6 rounded-lg shadow-lg mb-6">
+          <div className="flex justify-between items-center mb-4">
+            <div>
+              <h2 className="text-2xl font-bold">Lista de Citas</h2>
+              <p>Aquí puedes encontrar una lista de todas las citas registradas en el sistema.</p>
+            </div>
+            <Link href="appointments/create" className="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors">
+              Añadir Nueva Cita
+            </Link>
           </div>
-          <Link href="appointments/create" className="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors">
-            Añadir Nueva Cita
-          </Link>
         </div>
-      </div>
-      <div className="bg-white p-6 rounded-lg shadow-lg">
-        <GenericTable
-          data={data}
-          columns={columns}
-          actions={(appointment) => (
-            <>
-              <Link href={`appointments/edit/?id=${appointment.id}`}>
-                <span className="bg-yellow-500 text-white py-1 px-2 rounded-lg hover:bg-yellow-600 transition-colors cursor-pointer">
-                  Editar
-                </span>
-              </Link>
-              <button
-                onClick={() => openModal(appointment.id)}
-                className="bg-red-500 text-white py-1 px-2 rounded-lg hover:bg-red-600 transition-colors ml-2"
-              >
-                Eliminar
-              </button>
-            </>
-          )}
+        <div className="bg-white p-6 rounded-lg shadow-lg">
+          <GenericTable
+            data={data}
+            columns={columns}
+            actions={(appointment) => (
+              <>
+                <Link href={`appointments/edit/?id=${appointment.id}`}>
+                  <span className="bg-yellow-500 text-white py-1 px-2 rounded-lg hover:bg-yellow-600 transition-colors cursor-pointer">
+                    Editar
+                  </span>
+                </Link>
+                <button
+                  onClick={() => openModal(appointment.id)}
+                  className="bg-red-500 text-white py-1 px-2 rounded-lg hover:bg-red-600 transition-colors ml-2"
+                >
+                  Eliminar
+                </button>
+              </>
+            )}
+          />
+        </div>
+        <ConfirmModal
+          isOpen={isModalOpen}
+          onClose={closeModal}
+          onConfirm={confirmDelete}
+          title="Confirmar Eliminación"
+          message="¿Estás seguro de que deseas eliminar esta cita?"
         />
-      </div>
-      <ConfirmModal
-        isOpen={isModalOpen}
-        onClose={closeModal}
-        onConfirm={confirmDelete}
-        title="Confirmar Eliminación"
-        message="¿Estás seguro de que deseas eliminar esta cita?"
-      />
-    </PageTemplate>
+      </PageTemplate>
+    </ProtectedRoute>
   );
 };
 

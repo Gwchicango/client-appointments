@@ -14,7 +14,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, allowedRoles 
   React.useEffect(() => {
     const role = localStorage.getItem('role');
     if (!token || !role || !allowedRoles.includes(role)) {
-      router.push('dashboard');
+      router.push('/pages/dashboard');
     }
   }, [token, allowedRoles, router]);
 

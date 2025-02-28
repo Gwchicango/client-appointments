@@ -5,6 +5,7 @@ import PageTemplate from '@/app/(components)/PageTemplate';
 import GenericForm from '@/app/(components)/GenericForm';
 import { doctorApi, DoctorPost } from '../doctorApi';
 import { useRouter } from 'next/navigation';
+import ProtectedRoute from '@/app/(components)/ProtectedRoute';
 
 const CreateDoctorPage: React.FC = () => {
   const [doctor, setDoctor] = useState<Partial<DoctorPost>>({
@@ -68,17 +69,19 @@ const CreateDoctorPage: React.FC = () => {
   ];
 
   return (
-    <PageTemplate loading={loading}>
-      <GenericForm
-        data={doctor}
-        loading={loading}
-        error={error}
-        handleChange={handleChange}
-        handleSubmit={handleSubmit}
-        fields={fields}
-        title="Añadir Nuevo Doctor"
-      />
-    </PageTemplate>
+    <ProtectedRoute allowedRoles={['ADMIN'] }>
+      <PageTemplate loading={loading}>
+        <GenericForm
+          data={doctor}
+          loading={loading}
+          error={error}
+          handleChange={handleChange}
+          handleSubmit={handleSubmit}
+          fields={fields}
+          title="Añadir Nuevo Doctor"
+        />
+      </PageTemplate>
+    </ProtectedRoute>
   );
 };
 

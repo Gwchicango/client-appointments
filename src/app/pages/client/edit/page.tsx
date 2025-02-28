@@ -6,6 +6,7 @@ import GenericForm from '@/app/(components)/GenericForm';
 import { userApi, User } from '../clientApi';
 import { useRouter, useSearchParams } from 'next/navigation';
 import dayjs from 'dayjs';
+import ProtectedRoute from '@/app/(components)/ProtectedRoute';
 
 const EditClientPage: React.FC = () => {
   const [client, setClient] = useState<Partial<User>>({
@@ -98,20 +99,22 @@ const EditClientPage: React.FC = () => {
   ];
 
   return (
-    <PageTemplate loading={loading}>
-      <div className="bg-white p-6 rounded-lg shadow-lg mb-6">
-        <h2 className="text-2xl font-bold mb-4">Editar Cliente</h2>
-        <GenericForm
-          data={client}
-          loading={loading}
-          error={error}
-          handleChange={handleChange}
-          handleSubmit={handleSubmit}
-          fields={fields}
-          title="Editar Cliente"
-        />
-      </div>
-    </PageTemplate>
+    <ProtectedRoute allowedRoles={['ADMIN']}>
+      <PageTemplate loading={loading}>
+        <div className="bg-white p-6 rounded-lg shadow-lg mb-6">
+          <h2 className="text-2xl font-bold mb-4">Editar Cliente</h2>
+          <GenericForm
+            data={client}
+            loading={loading}
+            error={error}
+            handleChange={handleChange}
+            handleSubmit={handleSubmit}
+            fields={fields}
+            title="Editar Cliente"
+          />
+        </div>
+      </PageTemplate>
+    </ProtectedRoute>
   );
 };
 

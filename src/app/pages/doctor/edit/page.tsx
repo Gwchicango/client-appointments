@@ -5,7 +5,7 @@ import PageTemplate from '@/app/(components)/PageTemplate';
 import GenericForm from '@/app/(components)/GenericForm';
 import { doctorApi, DoctorPut, Doctor } from '../doctorApi';
 import { useRouter, useSearchParams } from 'next/navigation';
-import dayjs from 'dayjs';
+import ProtectedRoute from '@/app/(components)/ProtectedRoute';
 
 const EditDoctorPage: React.FC = () => {
   const [doctor, setDoctor] = useState<Partial<DoctorPut>>({
@@ -94,8 +94,8 @@ const EditDoctorPage: React.FC = () => {
   ];
 
   return (
-    <PageTemplate loading={loading}>
-
+    <ProtectedRoute allowedRoles={['ADMIN']}>
+      <PageTemplate loading={loading}>
         <GenericForm
           data={doctor}
           loading={loading}
@@ -105,7 +105,8 @@ const EditDoctorPage: React.FC = () => {
           fields={fields}
           title="Editar Doctor"
         />
-    </PageTemplate>
+      </PageTemplate>
+    </ProtectedRoute>
   );
 };
 

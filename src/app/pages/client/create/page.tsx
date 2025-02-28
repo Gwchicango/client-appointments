@@ -6,6 +6,7 @@ import GenericForm from '@/app/(components)/GenericForm';
 import { userApi, UserPost } from '../clientApi';
 import { useRouter } from 'next/navigation';
 import dayjs from 'dayjs';
+import ProtectedRoute from '@/app/(components)/ProtectedRoute';
 
 const CreateClientPage: React.FC = () => {
   const [client, setClient] = useState<Partial<UserPost>>({
@@ -71,20 +72,22 @@ const CreateClientPage: React.FC = () => {
   ];
 
   return (
-    <PageTemplate loading={loading}>
-      <div className="bg-white p-6 rounded-lg shadow-lg mb-6">
-        <h2 className="text-2xl font-bold mb-4">Añadir Nuevo Cliente</h2>
-        <GenericForm
-          data={client}
-          loading={loading}
-          error={error}
-          handleChange={handleChange}
-          handleSubmit={handleSubmit}
-          fields={fields}
-          title="Añadir Nuevo Cliente"
-        />
-      </div>
-    </PageTemplate>
+    <ProtectedRoute allowedRoles={['ADMIN']}>
+      <PageTemplate loading={loading}>
+        <div className="bg-white p-6 rounded-lg shadow-lg mb-6">
+          <h2 className="text-2xl font-bold mb-4">Añadir Nuevo Cliente</h2>
+          <GenericForm
+            data={client}
+            loading={loading}
+            error={error}
+            handleChange={handleChange}
+            handleSubmit={handleSubmit}
+            fields={fields}
+            title="Añadir Nuevo Cliente"
+          />
+        </div>
+      </PageTemplate>
+    </ProtectedRoute>
   );
 };
 

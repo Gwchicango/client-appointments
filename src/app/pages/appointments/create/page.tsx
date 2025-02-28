@@ -8,6 +8,8 @@ import { doctorApi, Doctor } from '../../doctor/doctorApi';
 import { userApi, User } from '../../client/clientApi';
 import { useRouter } from 'next/navigation';
 import dayjs from 'dayjs';
+import ProtectedRoute from '@/app/(components)/ProtectedRoute';
+
 
 const CreateAppointmentPage: React.FC = () => {
   const [appointment, setAppointment] = useState<Partial<AppointmentPost>>({
@@ -113,20 +115,19 @@ const CreateAppointmentPage: React.FC = () => {
   ];
 
   return (
-    <PageTemplate loading={loading}>
-      <div className="bg-white p-6 rounded-lg shadow-lg mb-6">
-        <h2 className="text-2xl font-bold mb-4">Añadir Nueva Cita</h2>
-        <GenericForm
-          data={appointment}
-          loading={loading}
-          error={error}
-          handleChange={handleChange}
-          handleSubmit={handleSubmit}
-          fields={fields}
-          title="Añadir Nueva Cita"
-        />
-      </div>
-    </PageTemplate>
+    <ProtectedRoute allowedRoles={['ADMIN', 'PATIENT']}>
+      <PageTemplate loading={loading}>
+          <GenericForm
+            data={appointment}
+            loading={loading}
+            error={error}
+            handleChange={handleChange}
+            handleSubmit={handleSubmit}
+            fields={fields}
+            title="Añadir Nueva Cita"
+          />
+      </PageTemplate>
+    </ProtectedRoute>
   );
 };
 

@@ -6,6 +6,7 @@ import ConfirmModal from '@/app/(components)/ConfirmModal';
 import GenericTable from '@/app/(components)/GenericTable';
 import { userApi, User } from './clientApi';
 import Link from 'next/link';
+import ProtectedRoute from '@/app/(components)/ProtectedRoute';
 
 const ClientListPage: React.FC = () => {
   const [clients, setClients] = useState<User[]>([]);
@@ -77,47 +78,49 @@ const ClientListPage: React.FC = () => {
   ];
 
   return (
-    <PageTemplate loading={loading}>
-      <div className="bg-white p-6 rounded-lg shadow-lg mb-6">
-        <div className="flex justify-between items-center mb-4">
-          <div>
-            <h2 className="text-2xl font-bold">Lista de Clientes</h2>
-            <p>Aquí puedes encontrar una lista de todos los clientes registrados en el sistema.</p>
+    <ProtectedRoute allowedRoles={['ADMIN']}>
+      <PageTemplate loading={loading}>
+        <div className="bg-white p-6 rounded-lg shadow-lg mb-6">
+          <div className="flex justify-between items-center mb-4">
+            <div>
+              <h2 className="text-2xl font-bold">Lista de Clientes</h2>
+              <p>Aquí puedes encontrar una lista de todos los clientes registrados en el sistema.</p>
+            </div>
+            <Link href="client/create" className="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors">
+              Añadir Nuevo Cliente
+            </Link>
           </div>
-          <Link href="client/create" className="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors">
-            Añadir Nuevo Cliente
-          </Link>
         </div>
-      </div>
-      <div className="bg-white p-6 rounded-lg shadow-lg">
-        <GenericTable
-          data={clients}
-          columns={columns}
-          actions={(client) => (
-            <>
-              <Link href={`client/edit/?id=${client.id}`}>
-                <span className="bg-yellow-500 text-white py-1 px-2 rounded-lg hover:bg-yellow-600 transition-colors cursor-pointer">
-                  Editar
-                </span>
-              </Link>
-              <button
-                onClick={() => openModal(client.id)}
-                className="bg-red-500 text-white py-1 px-2 rounded-lg hover:bg-red-600 transition-colors"
-              >
-                Eliminar
-              </button>
-            </>
-          )}
+        <div className="bg-white p-6 rounded-lg shadow-lg">
+          <GenericTable
+            data={clients}
+            columns={columns}
+            actions={(client) => (
+              <>
+                <Link href={`client/edit/?id=${client.id}`}>
+                  <span className="bg-yellow-500 text-white py-1 px-2 rounded-lg hover:bg-yellow-600 transition-colors cursor-pointer">
+                    Editar
+                  </span>
+                </Link>
+                <button
+                  onClick={() => openModal(client.id)}
+                  className="bg-red-500 text-white py-1 px-2 rounded-lg hover:bg-red-600 transition-colors"
+                >
+                  Eliminar
+                </button>
+              </>
+            )}
+          />
+        </div>
+        <ConfirmModal
+          isOpen={isModalOpen}
+          onClose={closeModal}
+          onConfirm={confirmDelete}
+          title="Confirmar Eliminación"
+          message="¿Estás seguro de que deseas eliminar este cliente?"
         />
-      </div>
-      <ConfirmModal
-        isOpen={isModalOpen}
-        onClose={closeModal}
-        onConfirm={confirmDelete}
-        title="Confirmar Eliminación"
-        message="¿Estás seguro de que deseas eliminar este cliente?"
-      />
-    </PageTemplate>
+      </PageTemplate>
+    </ProtectedRoute>
   );
 };
 
