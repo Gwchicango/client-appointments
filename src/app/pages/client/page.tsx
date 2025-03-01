@@ -78,7 +78,7 @@ const ClientListPage: React.FC = () => {
   ];
 
   return (
-    <ProtectedRoute allowedRoles={['ADMIN']}>
+    <ProtectedRoute allowedRoles={['PATIENT']}>
       <PageTemplate loading={loading}>
         <div className="bg-white p-6 rounded-lg shadow-lg mb-6">
           <div className="flex justify-between items-center mb-4">
@@ -97,7 +97,7 @@ const ClientListPage: React.FC = () => {
             columns={columns}
             actions={(client) => (
               <>
-                <Link href={`client/edit/?id=${client.id}`}>
+                <Link href={`client/edit/${client.id}`}>
                   <span className="bg-yellow-500 text-white py-1 px-2 rounded-lg hover:bg-yellow-600 transition-colors cursor-pointer">
                     Editar
                   </span>

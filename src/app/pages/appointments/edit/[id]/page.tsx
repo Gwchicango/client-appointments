@@ -3,12 +3,13 @@
 import React, { useEffect, useState } from 'react';
 import PageTemplate from '@/app/(components)/PageTemplate';
 import GenericForm from '@/app/(components)/GenericForm';
-import { appointmentApi, Appointment } from '../appointmentsApi';
-import { doctorApi, Doctor } from '../../doctor/doctorApi';
-import { userApi, User } from '../../client/clientApi';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { appointmentApi, Appointment } from '../../appointmentsApi';
+import { doctorApi, Doctor } from '../../../doctor/doctorApi';
+import { userApi, User } from '../../../client/clientApi';
+import { useRouter } from 'next/navigation';
 import dayjs from 'dayjs';
 import ProtectedRoute from '@/app/(components)/ProtectedRoute';
+import { useParams } from 'next/navigation';
 
 const EditAppointmentPage: React.FC = () => {
   const [appointment, setAppointment] = useState<Partial<Appointment>>({
@@ -23,12 +24,11 @@ const EditAppointmentPage: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const appointmentId = searchParams.get('id');
+  const { id } = useParams();
 
   useEffect(() => {
     const fetchData = async () => {
-      if (!appointmentId) {
+      if (!id) {
         setError('No appointment ID provided');
         setLoading(false);
         return;
@@ -36,7 +36,7 @@ const EditAppointmentPage: React.FC = () => {
 
       try {
         const [appointmentResponse, doctorResponse, clientResponse] = await Promise.all([
-          appointmentApi.getAppointmentById(Number(appointmentId)),
+          appointmentApi.getAppointmentById(Number(id)),
           doctorApi.getDoctors(),
           userApi.getUsers(),
         ]);
@@ -66,7 +66,7 @@ const EditAppointmentPage: React.FC = () => {
     };
 
     fetchData();
-  }, [appointmentId]);
+  }, [id]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -101,7 +101,7 @@ const EditAppointmentPage: React.FC = () => {
         time: dateTime.format('HH:mm'), // Formato de hora compatible con LocalTime
       };
 
-      const response = await appointmentApi.updateAppointment(Number(appointmentId), updatedAppointment as Appointment);
+      const response = await appointmentApi.updateAppointment(Number(id), updatedAppointment as Appointment);
       if (response.status === 200) {
         router.push('/pages/appointments');
       } else {

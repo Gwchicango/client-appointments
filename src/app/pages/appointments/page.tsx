@@ -137,7 +137,7 @@ const AppointmentListPage: React.FC = () => {
             columns={columns}
             actions={(appointment) => (
               <>
-                <Link href={`appointments/edit/?id=${appointment.id}`}>
+                <Link href={`appointments/edit/${appointment.id}`}>
                   <span className="bg-yellow-500 text-white py-1 px-2 rounded-lg hover:bg-yellow-600 transition-colors cursor-pointer">
                     Editar
                   </span>

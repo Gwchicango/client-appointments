@@ -3,10 +3,11 @@
 import React, { useEffect, useState } from 'react';
 import PageTemplate from '@/app/(components)/PageTemplate';
 import GenericForm from '@/app/(components)/GenericForm';
-import { userApi, User } from '../clientApi';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { userApi, User } from '../../clientApi';
+import { useRouter } from 'next/navigation';
 import dayjs from 'dayjs';
 import ProtectedRoute from '@/app/(components)/ProtectedRoute';
+import { useParams } from 'next/navigation';
 
 const EditClientPage: React.FC = () => {
   const [client, setClient] = useState<Partial<User>>({
@@ -23,19 +24,18 @@ const EditClientPage: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const clientId = searchParams.get('id');
+  const { id } = useParams();
 
   useEffect(() => {
     const fetchClient = async () => {
-      if (!clientId) {
+      if (!id) {
         setError('No client ID provided');
         setLoading(false);
         return;
       }
 
       try {
-        const response = await userApi.getUserById(Number(clientId));
+        const response = await userApi.getUserById(Number(id));
         if (response.status === 200 && response.data) {
           setClient(response.data);
         } else {
@@ -49,11 +49,11 @@ const EditClientPage: React.FC = () => {
     };
 
     fetchClient();
-  }, [clientId]);
+  }, [id]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setClient((prevClient) => ({
+    setClient((prevClient: Partial<User>) => ({
       ...prevClient,
       [name]: value,
     }));
@@ -70,7 +70,7 @@ const EditClientPage: React.FC = () => {
         birthdate: dayjs(client.birthdate).format('YYYY-MM-DD'), // Formato de fecha compatible con LocalDate
       };
 
-      const response = await userApi.updateUser(Number(clientId), updatedClient as User);
+      const response = await userApi.updateUser(Number(id), updatedClient as User);
       if (response.status === 200) {
         router.push('/pages/client');
       } else {
@@ -99,7 +99,7 @@ const EditClientPage: React.FC = () => {
   ];
 
   return (
-    <ProtectedRoute allowedRoles={['ADMIN']}>
+    <ProtectedRoute allowedRoles={['PATIENT']}>
       <PageTemplate loading={loading}>
         <div className="bg-white p-6 rounded-lg shadow-lg mb-6">
           <h2 className="text-2xl font-bold mb-4">Editar Cliente</h2>

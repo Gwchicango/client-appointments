@@ -3,9 +3,10 @@
 import React, { useEffect, useState } from 'react';
 import PageTemplate from '@/app/(components)/PageTemplate';
 import GenericForm from '@/app/(components)/GenericForm';
-import { doctorApi, DoctorPut, Doctor } from '../doctorApi';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { doctorApi, DoctorPut, Doctor } from '../../doctorApi';
+import { useRouter } from 'next/navigation';
 import ProtectedRoute from '@/app/(components)/ProtectedRoute';
+import { useParams } from 'next/navigation';
 
 const EditDoctorPage: React.FC = () => {
   const [doctor, setDoctor] = useState<Partial<DoctorPut>>({
@@ -18,19 +19,18 @@ const EditDoctorPage: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const doctorId = searchParams.get('id');
+  const { id } = useParams();
 
   useEffect(() => {
     const fetchDoctor = async () => {
-      if (!doctorId) {
+      if (!id) {
         setError('No doctor ID provided');
         setLoading(false);
         return;
       }
 
       try {
-        const response = await doctorApi.getDoctorById(Number(doctorId));
+        const response = await doctorApi.getDoctorById(Number(id));
         if (response.status === 200 && response.data) {
           setDoctor(response.data);
         } else {
@@ -44,7 +44,7 @@ const EditDoctorPage: React.FC = () => {
     };
 
     fetchDoctor();
-  }, [doctorId]);
+  }, [id]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -64,7 +64,7 @@ const EditDoctorPage: React.FC = () => {
         ...doctor,
       };
 
-      const response = await doctorApi.updateDoctor(Number(doctorId), updatedDoctor as Doctor);
+      const response = await doctorApi.updateDoctor(Number(id), updatedDoctor as Doctor);
       if (response.status === 200) {
         router.push('/pages/doctor');
       } else {
@@ -94,7 +94,7 @@ const EditDoctorPage: React.FC = () => {
   ];
 
   return (
-    <ProtectedRoute allowedRoles={['ADMIN']}>
+    <ProtectedRoute allowedRoles={['PATIENT']}>
       <PageTemplate loading={loading}>
         <GenericForm
           data={doctor}
