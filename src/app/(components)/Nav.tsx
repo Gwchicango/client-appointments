@@ -37,7 +37,7 @@ const Nav: React.FC = () => {
                             <span className="text-lg">Home</span>
                         </Link>
                     </li>
-                    {role === 'ADMIN' && (
+                    {role === 'ADMIN' || role === 'USER' && (
                         <>
                             <li className="mb-4">
                                 <Link href="/pages/doctor" className="flex items-center p-2 rounded-lg hover:bg-blue-700 transition-colors">

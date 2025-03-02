@@ -17,6 +17,7 @@ const initialToken =
 // Crear el contexto de autenticación con el valor inicial del token
 const AuthContext = createContext<AuthContextProps>({
   token: initialToken,
+  
   setToken: () => {},
   requestNewToken: () => Promise.resolve(),
 });
@@ -45,6 +46,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     if (roles.length > 0) {
       localStorage.setItem("user_role", roles[0]); // Guardar el primer rol encontrado
     }
+    console.log("roles", roles[0]);
     console.log(decodedToken);
   }, [token, router]);
 

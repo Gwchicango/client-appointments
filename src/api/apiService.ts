@@ -45,9 +45,9 @@ addAuthInterceptor(axiosInstance);
 
 // Método para redirigir al login y borrar el token del localStorage
 const redirectToLogin = () => {
-  localStorage.removeItem("access_token");
+  //localStorage.removeItem("access_token");
   localStorage.removeItem("role");
-  window.location.href = "/auth/login";
+  //window.location.href = "/auth/login";
 };
 
 /**

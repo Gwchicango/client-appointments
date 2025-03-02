@@ -7,6 +7,7 @@ export default function AuthPage() {
   const router = useRouter();
 
   useEffect(() => {
+    
     // Obtener la ruta actual
     const path = window.location.pathname;
 

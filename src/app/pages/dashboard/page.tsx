@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from 'react';
 import PageTemplate from '@/app/(components)/PageTemplate';
-import { FaUsers, FaCalendarAlt, FaUserMd } from 'react-icons/fa';
 import { doctorApi, Doctor } from '@/app/pages/doctor/doctorApi';
 import { userApi, User } from '@/app/pages/client/clientApi';
 import { appointmentApi, Appointment } from '@/app/pages/appointments/appointmentsApi';
@@ -19,6 +18,7 @@ const DashboardPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<string>("doctors");
 
   useEffect(() => {
+    console.log('Fetching data...');
     const fetchData = async () => {
       try {
         const [doctorResponse, clientResponse, appointmentResponse] = await Promise.all([
@@ -103,7 +103,7 @@ const DashboardPage: React.FC = () => {
   ];
 
   return (
-    <ProtectedRoute allowedRoles={['ADMIN','ADMIN']}>
+    <ProtectedRoute allowedRoles={['ADMIN','USER']}>
       <PageTemplate loading={loading}>
         <div className="bg-white p-6 rounded-lg shadow-lg mb-6">
           <h2 className="text-2xl font-bold mb-4">¡Bienvenido al Panel de Control!</h2>

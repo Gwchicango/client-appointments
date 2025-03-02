@@ -22,6 +22,7 @@ const AppointmentListPage: React.FC = () => {
   const userId = Number(localStorage.getItem('idUser'));
 
   useEffect(() => {
+    console.log("Fetching data... appoiments");
     const fetchData = async () => {
       try {
         const [appointmentResponse, doctorResponse, clientResponse] = await Promise.all([
@@ -118,7 +119,7 @@ const AppointmentListPage: React.FC = () => {
   }));
 
   return (
-    <ProtectedRoute allowedRoles={['ADMIN', 'ADMIN']}>
+    <ProtectedRoute allowedRoles={['ADMIN', 'USER']}>
       <PageTemplate loading={loading}>
         <div className="bg-white p-6 rounded-lg shadow-lg mb-6">
           <div className="flex justify-between items-center mb-4">
