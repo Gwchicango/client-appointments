@@ -52,7 +52,7 @@ const DashboardPage: React.FC = () => {
     };
 
     fetchData();
-  }, []);
+  }, []); // Dependencias vacías para ejecutar solo una vez
 
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(event.target.value);
@@ -103,7 +103,7 @@ const DashboardPage: React.FC = () => {
   ];
 
   return (
-    <ProtectedRoute allowedRoles={['ADMIN','PATIENT']}>
+    <ProtectedRoute allowedRoles={['ADMIN','ADMIN']}>
       <PageTemplate loading={loading}>
         <div className="bg-white p-6 rounded-lg shadow-lg mb-6">
           <h2 className="text-2xl font-bold mb-4">¡Bienvenido al Panel de Control!</h2>

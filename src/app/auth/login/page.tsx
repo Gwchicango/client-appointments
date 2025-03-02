@@ -3,7 +3,55 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { userApi } from "@/app/pages/client/clientApi";
+
+interface TokenData {
+  access_token: string;
+  token_type: string;
+  expires_in: number;
+  refresh_token: string;
+  scope: string;
+}
+
+interface ErrorResponse {
+  error: string;
+  error_description: string;
+}
+
+const authenticateUser = async (username: string, password: string): Promise<TokenData> => {
+  const params = new URLSearchParams();
+  params.append("grant_type", "password");
+  params.append("client_id", "CimedClient");
+  params.append("client_secret", "LX3PKkMRtPaE0c6oXoAdvm3w1H1PJiAI");
+  params.append("username", username);
+  params.append("password", password);
+  params.append("scope", "openid");
+
+  const response = await fetch("http://172.172.141.223:8040/realms/CimedRealm/protocol/openid-connect/token", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+    body: params,
+  });
+
+  if (response.ok) {
+    const contentType = response.headers.get("content-type");
+    if (contentType && contentType.includes("application/json")) {
+      const data: TokenData = await response.json();
+      return data;
+    } else {
+      throw new Error("Formato de respuesta inesperado");
+    }
+  } else {
+    const errorText = await response.text();
+    try {
+      const error: ErrorResponse = JSON.parse(errorText);
+      throw new Error(error.error_description || "Error al autenticar");
+    } catch (e) {
+      throw new Error("Error al autenticar: " + errorText);
+    }
+  }
+};
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -18,26 +66,17 @@ export default function Login() {
     setError("");
 
     try {
-      const response = await userApi.getUsers();
-      const users = response.data;
+      const tokenData: TokenData = await authenticateUser(email, password);
+      console.log("Token recibido:", tokenData);
 
-      if (users) {
-        const user = users.find((user) => user.email === email && user.password === password);
-        if (user) {
-          // Manejar la respuesta exitosa aquí (por ejemplo, redirigir al usuario)
-          //guaradar en el local storage el rol del usuario
-          localStorage.setItem("role", user.role);
-          localStorage.setItem("idUser", user.id.toString())
-          router.push("/pages/dashboard");
-        } else {
-          setError("Credenciales incorrectas. Por favor, verifica tu correo electrónico y contraseña.");
-        }
-      } else {
-        setError("Error al obtener los usuarios. Por favor, intenta nuevamente.");
-      }
+      // Guarda el token en el almacenamiento local
+      localStorage.setItem("access_token", tokenData.access_token);
+
+      // Redirige al usuario al dashboard
+      router.push("/pages/dashboard");
     } catch (error) {
-      setError("Error al iniciar sesión. Por favor, verifica tus credenciales.");
-      console.error("Login error:", error);
+      setError("Error al iniciar sesión. Verifica tus credenciales.");
+      console.error("Error:", error);
     } finally {
       setIsLoading(false);
     }

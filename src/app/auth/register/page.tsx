@@ -2,45 +2,105 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import { userApi } from "@/app/pages/client/clientApi";
 import Link from "next/link";
+
+const getAdminToken = async () => {
+  const params = new URLSearchParams();
+  params.append("grant_type", "client_credentials"); // Flujo de client_credentials
+  params.append("client_id", "CimedClient"); // ID del cliente
+  params.append("client_secret", "LX3PKkMRtPaE0c6oXoAdvm3w1H1PJiAI"); // Client secret
+
+  const response = await fetch(
+    "http://172.172.141.223:8040/realms/CimedRealm/protocol/openid-connect/token", // Endpoint de token
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: params,
+    }
+  );
+
+  if (response.ok) {
+    const data = await response.json();
+    return data.access_token; // Retorna el token de acceso
+  } else {
+    throw new Error("Error al obtener el token de administrador");
+  }
+};
+
+interface UserCredentials {
+  type: string;
+  value: string;
+  temporary: boolean;
+}
+
+interface UserData {
+  username: string;
+  email: string;
+  enabled: boolean;
+  credentials: UserCredentials[];
+}
+
+const registerUser = async (username: string, email: string, password: string): Promise<Response> => {
+  const userData: UserData = {
+    username: username,
+    email: email,
+    enabled: true,
+    credentials: [
+      {
+        type: "password",
+        value: password,
+        temporary: false,
+      },
+    ],
+  };
+
+  const token = await getAdminToken();
+
+  const response = await fetch(
+    "http://172.172.141.223:8040/admin/realms/CimedRealm/users",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(userData),
+    }
+  );
+
+  return response;
+};
 
 const RegisterPage: React.FC = () => {
   const router = useRouter();
-  const [name, setName] = useState("");
-  const [lastname, setLastname] = useState("");
-  const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [phone, setPhone] = useState("");
-  const [address, setAddress] = useState("");
-  const [birthdate, setBirthdate] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
 
   const handleRegister = async (event: React.FormEvent) => {
     event.preventDefault();
     setError(null);
+    setSuccess(null);
 
     try {
-      const response = await userApi.createUser({
-        name,
-        lastname,
-        email,
-        username,
-        password,
-        role: "PATIENT",
-        phone,
-        address,
-        birthdate,
-      });
-
-      if (response.status === 200) {
+      const response = await registerUser(username, email, password);
+      if (response.ok) {
+        setSuccess("Usuario registrado correctamente.");
+        setError(null);
         router.push("/auth/login");
       } else {
-        setError(response.statusText);
+        const errorData = await response.json();
+        setError(errorData.errorMessage || "Error al registrar el usuario.");
+        setSuccess(null);
       }
     } catch (err) {
-      setError("Registration failed. Please try again.");
+      setError("Error en la solicitud. Inténtalo de nuevo.");
+      setSuccess(null);
+      console.error("Error:", err);
     }
   };
 
@@ -53,26 +113,14 @@ const RegisterPage: React.FC = () => {
           <form onSubmit={handleRegister}>
             <div className="flex flex-wrap -mx-2">
               <div className="w-full sm:w-1/2 px-2 mb-4">
-                <label className="block text-gray-700 mb-2" htmlFor="name">Nombre</label>
+                <label className="block text-gray-700 mb-2" htmlFor="username">Nombre de Usuario</label>
                 <input
                   type="text"
-                  id="name"
+                  id="username"
                   className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
-                  placeholder="Tu nombre"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  required
-                />
-              </div>
-              <div className="w-full sm:w-1/2 px-2 mb-4">
-                <label className="block text-gray-700 mb-2" htmlFor="lastname">Apellido</label>
-                <input
-                  type="text"
-                  id="lastname"
-                  className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
-                  placeholder="Tu apellido"
-                  value={lastname}
-                  onChange={(e) => setLastname(e.target.value)}
+                  placeholder="Tu nombre de usuario"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
                   required
                 />
               </div>
@@ -89,18 +137,6 @@ const RegisterPage: React.FC = () => {
                 />
               </div>
               <div className="w-full sm:w-1/2 px-2 mb-4">
-                <label className="block text-gray-700 mb-2" htmlFor="username">Nombre de Usuario</label>
-                <input
-                  type="text"
-                  id="username"
-                  className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
-                  placeholder="Tu nombre de usuario"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  required
-                />
-              </div>
-              <div className="w-full sm:w-1/2 px-2 mb-4">
                 <label className="block text-gray-700 mb-2" htmlFor="password">Contraseña</label>
                 <input
                   type="password"
@@ -112,43 +148,9 @@ const RegisterPage: React.FC = () => {
                   required
                 />
               </div>
-              <div className="w-full sm:w-1/2 px-2 mb-4">
-                <label className="block text-gray-700 mb-2" htmlFor="phone">Teléfono</label>
-                <input
-                  type="text"
-                  id="phone"
-                  className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
-                  placeholder="Tu teléfono"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  required
-                />
-              </div>
-              <div className="w-full sm:w-1/2 px-2 mb-4">
-                <label className="block text-gray-700 mb-2" htmlFor="address">Dirección</label>
-                <input
-                  type="text"
-                  id="address"
-                  className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
-                  placeholder="Tu dirección"
-                  value={address}
-                  onChange={(e) => setAddress(e.target.value)}
-                  required
-                />
-              </div>
-              <div className="w-full sm:w-1/2 px-2 mb-4">
-                <label className="block text-gray-700 mb-2" htmlFor="birthdate">Fecha de Nacimiento</label>
-                <input
-                  type="date"
-                  id="birthdate"
-                  className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
-                  value={birthdate}
-                  onChange={(e) => setBirthdate(e.target.value)}
-                  required
-                />
-              </div>
             </div>
             {error && <p className="text-red-500">{error}</p>}
+            {success && <p className="text-green-500">{success}</p>}
             <button
               type="submit"
               className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors"

@@ -1,17 +1,27 @@
 "use client";
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { FaUsers, FaCalendarAlt, FaHome, FaCog, FaSignOutAlt, FaUserMd } from 'react-icons/fa';
+import keycloak from '@/app/(components)/keycloakConfig';
 
 const Nav: React.FC = () => {
-    const role = localStorage.getItem('role');
+    const [role, setRole] = useState<string | null>(null);
+
+    useEffect(() => {
+        if (typeof window !== "undefined") {
+            const userRole = localStorage.getItem('user_role');
+            setRole(userRole);
+        }
+    }, []);
 
     const handleLogout = () => {
-        // Aquí puedes agregar la lógica de logout, como limpiar el token de autenticación
+        // Limpiar el token de autenticación y otros datos del localStorage
         localStorage.removeItem('access_token');
-        localStorage.removeItem('role');
-        localStorage.removeItem('idUser');
+        localStorage.removeItem('user_role');
+
+        // Cerrar sesión en Keycloak
+        keycloak.logout();
     };
 
     return (
@@ -27,7 +37,7 @@ const Nav: React.FC = () => {
                             <span className="text-lg">Home</span>
                         </Link>
                     </li>
-                    {role === 'PATIENT' && (
+                    {role === 'ADMIN' && (
                         <>
                             <li className="mb-4">
                                 <Link href="/pages/doctor" className="flex items-center p-2 rounded-lg hover:bg-blue-700 transition-colors">

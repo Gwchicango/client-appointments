@@ -1,6 +1,6 @@
 "use client";
 
-import { jwtDecode } from "jwt-decode";
+import {jwtDecode} from "jwt-decode";
 import { useRouter } from "next/navigation";
 import React, { createContext, useState, useEffect, ReactNode } from "react";
 
@@ -37,14 +37,19 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     if (!token) {
       return;
     }
-    const decodedToken: { exp: number; iat: number } = jwtDecode(token);
+    const decodedToken: { exp: number; iat: number; resource_access: { [key: string]: { roles: string[] } } } = jwtDecode(token);
 
+    // Guardar el token y el rol en localStorage
     localStorage.setItem("access_token", token ?? "");
+    const roles = decodedToken.resource_access?.CimedClient?.roles || [];
+    if (roles.length > 0) {
+      localStorage.setItem("user_role", roles[0]); // Guardar el primer rol encontrado
+    }
     console.log(decodedToken);
   }, [token, router]);
 
   return (
-    <AuthContext.Provider value={{ token,  setToken, requestNewToken: async () => {} }}>
+    <AuthContext.Provider value={{ token, setToken, requestNewToken: async () => {} }}>
       {children}
     </AuthContext.Provider>
   );

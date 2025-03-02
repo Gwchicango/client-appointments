@@ -14,7 +14,7 @@ const DoctorListPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [selectedDoctorId, setSelectedDoctorId] = useState<number | null>(null);
-  const role = localStorage.getItem('role');
+  const role = typeof window !== "undefined" ? localStorage.getItem('user_role') : null;
 
   useEffect(() => {
     const fetchDoctors = async () => {
@@ -78,7 +78,7 @@ const DoctorListPage: React.FC = () => {
   ];
 
   return (
-    <ProtectedRoute allowedRoles={['ADMIN', 'PATIENT']}>
+    <ProtectedRoute allowedRoles={['ADMIN']}>
       <PageTemplate loading={loading}>
         <div className="bg-white p-6 rounded-lg shadow-lg mb-6">
           <div className="flex justify-between items-center mb-4">
@@ -86,7 +86,7 @@ const DoctorListPage: React.FC = () => {
               <h2 className="text-2xl font-bold">Lista de Doctores</h2>
               <p>Aquí puedes encontrar una lista de todos los doctores registrados en el sistema.</p>
             </div>
-            {role === 'PATIENT' && (
+            {role === 'ADMIN' && (
               <Link href="doctor/create" className="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors">
                 Añadir Nuevo Doctor
               </Link>
@@ -97,7 +97,7 @@ const DoctorListPage: React.FC = () => {
           <GenericTable
             data={doctors}
             columns={columns}
-            actions={role === 'PATIENT' ? (doctor) => (
+            actions={role === 'ADMIN' ? (doctor) => (
               <>
                 <Link href={`doctor/edit/${doctor.id}`}>
                   <span className="bg-yellow-500 text-white py-1 px-2 rounded-lg hover:bg-yellow-600 transition-colors cursor-pointer">

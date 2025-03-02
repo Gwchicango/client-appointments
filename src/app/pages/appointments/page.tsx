@@ -32,7 +32,7 @@ const AppointmentListPage: React.FC = () => {
 
         if (appointmentResponse.status === 200 && appointmentResponse.data) {
           let fetchedAppointments = appointmentResponse.data;
-          if (role === 'PATIENT') {
+          if (role === 'ADMIN') {
             fetchedAppointments = fetchedAppointments.filter((appointment: Appointment) => appointment.idPatient === userId);
           }
           setAppointments(fetchedAppointments);
@@ -118,7 +118,7 @@ const AppointmentListPage: React.FC = () => {
   }));
 
   return (
-    <ProtectedRoute allowedRoles={['ADMIN', 'PATIENT']}>
+    <ProtectedRoute allowedRoles={['ADMIN', 'ADMIN']}>
       <PageTemplate loading={loading}>
         <div className="bg-white p-6 rounded-lg shadow-lg mb-6">
           <div className="flex justify-between items-center mb-4">

@@ -1,14 +1,9 @@
-"use client";
-import { HeroUIProvider } from "@heroui/react";
+import { AuthProvider } from "@/app/(context)/AuthContext";
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-      <HeroUIProvider locale="es-ES">
+    <AuthProvider>
         {children}
-      </HeroUIProvider>
+    </AuthProvider>
   );
 }
