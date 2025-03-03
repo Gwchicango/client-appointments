@@ -19,12 +19,10 @@ const AppointmentListPage: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [selectedAppointmentId, setSelectedAppointmentId] = useState<number | null>(null);
   const [role, setRole] = useState<string | null>(null);
-  const [userId, setUserId] = useState<number | null>(null);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
       setRole(localStorage.getItem('user_role'));
-      setUserId(Number(localStorage.getItem('idUser')));
     }
   }, []);
 
@@ -37,12 +35,12 @@ const AppointmentListPage: React.FC = () => {
           userApi.getUsers(),
         ]);
 
+        console.log('appointmentResponse:', appointmentResponse);
+        console.log('doctorResponse:', doctorResponse);
+        console.log('clientResponse:', clientResponse);
+
         if (appointmentResponse.status === 200 && appointmentResponse.data) {
-          let fetchedAppointments = appointmentResponse.data;
-          if (role === 'USER') {
-            fetchedAppointments = fetchedAppointments.filter((appointment: Appointment) => appointment.idPatient === userId);
-          }
-          setAppointments(fetchedAppointments);
+          setAppointments(appointmentResponse.data);
         } else {
           setError(appointmentResponse.statusText);
         }
@@ -65,10 +63,8 @@ const AppointmentListPage: React.FC = () => {
       }
     };
 
-    if (role && userId !== null) {
-      fetchData();
-    }
-  }, [role, userId]);
+    fetchData();
+  }, []);
 
   const handleDelete = async (id: number) => {
     try {
@@ -126,6 +122,8 @@ const AppointmentListPage: React.FC = () => {
     doctorName: getDoctorName(appointment.idDoctor),
   }));
 
+  console.log('data:', data);
+
   return (
     <ProtectedRoute allowedRoles={['ADMIN', 'USER']}>
       <PageTemplate loading={loading}>
@@ -135,7 +133,7 @@ const AppointmentListPage: React.FC = () => {
               <h2 className="text-2xl font-bold">Lista de Citas</h2>
               <p>Aquí puedes encontrar una lista de todas las citas registradas en el sistema.</p>
             </div>
-            {role === 'ADMIN' && (
+            {role === 'USER' && (
               <Link href="appointments/create" className="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors">
                 Añadir Nueva Cita
               </Link>
@@ -146,25 +144,21 @@ const AppointmentListPage: React.FC = () => {
           <GenericTable
             data={data}
             columns={columns}
-            actions={(appointment) => (
-              <div>
-                {role === 'ADMIN' && (
-                  <>
-                    <Link href={`appointments/edit/${appointment.id}`}>
-                      <span className="bg-yellow-500 text-white py-1 px-2 rounded-lg hover:bg-yellow-600 transition-colors cursor-pointer">
-                        Editar
-                      </span>
-                    </Link>
-                    <button
-                      onClick={() => openModal(appointment.id)}
-                      className="bg-red-500 text-white py-1 px-2 rounded-lg hover:bg-red-600 transition-colors ml-2"
-                    >
-                      Cancelar
-                    </button>
-                  </>
-                )}
-              </div>
-            )}
+            actions={role === 'ADMIN' ? (appointment) => (
+              <>
+                <Link href={`appointments/edit/${appointment.id}`}>
+                  <span className="bg-yellow-500 text-white py-1 px-2 rounded-lg hover:bg-yellow-600 transition-colors cursor-pointer">
+                    Editar
+                  </span>
+                </Link>
+                <button
+                  onClick={() => openModal(appointment.id)}
+                  className="bg-red-500 text-white py-1 px-2 rounded-lg hover:bg-red-600 transition-colors ml-2"
+                >
+                  Cancelar
+                </button>
+              </>
+            ) : undefined}
           />
         </div>
         <ConfirmModal

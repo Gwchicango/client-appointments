@@ -103,6 +103,18 @@ const EditAppointmentPage: React.FC = () => {
 
       const response = await appointmentApi.updateAppointment(Number(id), updatedAppointment as Appointment);
       if (response.status === 200) {
+        // Actualiza la disponibilidad del doctor según el estado de la cita
+        const doctorId = updatedAppointment.idDoctor;
+        if (doctorId) {
+          let availability = 'AVAILABLE';
+          if (updatedAppointment.status === 'CONFIRMED') {
+            availability = 'BUSY';
+          }
+          const doctorToUpdate = doctors.find(doc => doc.id === doctorId);
+          if (doctorToUpdate) {
+            await doctorApi.updateDoctor(doctorId, { ...doctorToUpdate, availability });
+          }
+        }
         router.push('/pages/appointments');
       } else {
         setError(response.statusText);

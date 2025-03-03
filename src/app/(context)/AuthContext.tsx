@@ -63,8 +63,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         // Extraer roles del token
         const clientRoles = decodedToken.resource_access?.["CimedClient"]?.roles || [];
         if (clientRoles.length > 0) {
-          localStorage.setItem("user_role", clientRoles[1]); // Guardar el primer rol encontrado
-          console.log("Rol del usuario:", clientRoles[1]); // Depuración
+          localStorage.setItem("user_role", clientRoles[0]); // Guardar el primer rol encontrado
+          console.log("Rol del usuario:", clientRoles[0]); // Depuración
         } else {
           console.warn("No se encontraron roles en el token.");
         }

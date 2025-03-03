@@ -14,6 +14,13 @@ const ClientListPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [selectedClientId, setSelectedClientId] = useState<number | null>(null);
+  const [role, setRole] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setRole(localStorage.getItem('user_role'));
+    }
+  }, []);
 
   useEffect(() => {
     const fetchClients = async () => {
@@ -78,7 +85,7 @@ const ClientListPage: React.FC = () => {
   ];
 
   return (
-    <ProtectedRoute allowedRoles={['ADMIN']}>
+    <ProtectedRoute allowedRoles={['ADMIN', 'USER']}>
       <PageTemplate loading={loading}>
         <div className="bg-white p-6 rounded-lg shadow-lg mb-6">
           <div className="flex justify-between items-center mb-4">
@@ -102,12 +109,14 @@ const ClientListPage: React.FC = () => {
                     Editar
                   </span>
                 </Link>
-                <button
-                  onClick={() => openModal(client.id)}
-                  className="bg-red-500 text-white py-1 px-2 rounded-lg hover:bg-red-600 transition-colors"
-                >
-                  Eliminar
-                </button>
+                {role === 'ADMIN' && (
+                  <button
+                    onClick={() => openModal(client.id)}
+                    className="bg-red-500 text-white py-1 px-2 rounded-lg hover:bg-red-600 transition-colors"
+                  >
+                    Eliminar
+                  </button>
+                )}
               </>
             )}
           />

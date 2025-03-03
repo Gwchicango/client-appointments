@@ -1,5 +1,6 @@
 import React from 'react';
 import { useRouter } from 'next/navigation';
+import dayjs from 'dayjs';
 
 interface GenericFormProps<T> {
   data: T;
@@ -13,15 +14,41 @@ interface GenericFormProps<T> {
 
 const GenericForm = <T,>({ data, loading, error, handleChange, handleSubmit, fields, title }: GenericFormProps<T>) => {
   const router = useRouter();
+  const [validationError, setValidationError] = React.useState<string | null>(null);
 
   const handleCancel = () => {
     router.back(); // Navega a la página anterior
   };
 
+  const validateFields = () => {
+    const currentDate = dayjs();
+    for (const field of fields) {
+      if (field.type === 'date' || field.type === 'time') {
+        const fieldValue = data[field.name];
+        if (fieldValue && field.name !== 'birthdate') {
+          const dateTime = dayjs(String(fieldValue));
+          if (dateTime.isBefore(currentDate)) {
+            setValidationError(`La ${field.label} no puede ser inferior a la fecha actual.`);
+            return false;
+          }
+        }
+      }
+    }
+    setValidationError(null);
+    return true;
+  };
+
+  const handleFormSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (validateFields()) {
+      handleSubmit(e);
+    }
+  };
+
   return (
     <div className="bg-white p-8 rounded-2xl shadow-xl max-w-4xl mx-auto border border-gray-100">
       <h2 className="text-3xl font-bold mb-8 text-gray-800 text-center">{title}</h2>
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={handleFormSubmit} className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {fields.map((field) => (
             <div className="mb-6" key={String(field.name)}>
@@ -61,6 +88,11 @@ const GenericForm = <T,>({ data, loading, error, handleChange, handleSubmit, fie
         {error && (
           <div className="bg-red-50 border-l-4 border-red-400 text-red-700 p-4 rounded-lg text-sm">
             {error}
+          </div>
+        )}
+        {validationError && (
+          <div className="bg-red-50 border-l-4 border-red-400 text-red-700 p-4 rounded-lg text-sm">
+            {validationError}
           </div>
         )}
         <div className="flex justify-between">

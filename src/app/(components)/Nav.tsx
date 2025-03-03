@@ -48,7 +48,7 @@ const Nav: React.FC = () => {
                             </Link>
                         </li>
                     )}
-                    {role === 'ADMIN' && (
+                    {(role === 'ADMIN' || role === 'USER') && (
                         <li className="mb-4">
                             <Link href="/pages/client" className="flex items-center p-2 rounded-lg hover:bg-blue-700 transition-colors">
                                 <FaUsers className="mr-3 text-xl" />
@@ -61,14 +61,6 @@ const Nav: React.FC = () => {
                             <Link href="/pages/appointments" className="flex items-center p-2 rounded-lg hover:bg-blue-700 transition-colors">
                                 <FaCalendarAlt className="mr-3 text-xl" />
                                 <span className="text-lg">Gestión de Citas</span>
-                            </Link>
-                        </li>
-                    )}
-                    {role === 'ADMIN' && (
-                        <li className="mb-4">
-                            <Link href="/settings" className="flex items-center p-2 rounded-lg hover:bg-blue-700 transition-colors">
-                                <FaCog className="mr-3 text-xl" />
-                                <span className="text-lg">Settings</span>
                             </Link>
                         </li>
                     )}
