@@ -10,11 +10,10 @@ import { useRouter } from 'next/navigation';
 import dayjs from 'dayjs';
 import ProtectedRoute from '@/app/(components)/ProtectedRoute';
 
-
 const CreateAppointmentPage: React.FC = () => {
   const [appointment, setAppointment] = useState<Partial<AppointmentPost>>({
-    idPatient: 0,
-    idDoctor: 0,
+    idPatient: 0, // Cadena vacía por defecto
+    idDoctor: 0,  // Cadena vacía por defecto
     date: '',
     time: '',
   });
@@ -53,9 +52,10 @@ const CreateAppointmentPage: React.FC = () => {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
+
     setAppointment((prevAppointment) => ({
       ...prevAppointment,
-      [name]: value,
+      [name]: value, // Asigna el valor directamente (es una cadena)
     }));
   };
 
@@ -65,6 +65,15 @@ const CreateAppointmentPage: React.FC = () => {
     setError(null);
 
     try {
+      // Verifica que idPatient e idDoctor no sean cadenas vacías
+      if (!appointment.idPatient || !appointment.idDoctor) {
+        throw new Error("Debe seleccionar un paciente y un doctor");
+      }
+
+      // Convierte idPatient e idDoctor a números
+      const idPatient = Number(appointment.idPatient);
+      const idDoctor = Number(appointment.idDoctor);
+
       // Verifica que la fecha y la hora sean válidas
       if (!appointment.date || !appointment.time) {
         throw new Error("Fecha y hora son requeridas");
@@ -80,6 +89,8 @@ const CreateAppointmentPage: React.FC = () => {
 
       const newAppointment = {
         ...appointment,
+        idPatient, // Usa el valor convertido a número
+        idDoctor,  // Usa el valor convertido a número
         date: dateTime.format('YYYY-MM-DD'), // Formato de fecha compatible con LocalDate
         time: dateTime.format('HH:mm'), // Formato de hora compatible con LocalTime
       };
@@ -117,15 +128,15 @@ const CreateAppointmentPage: React.FC = () => {
   return (
     <ProtectedRoute allowedRoles={['ADMIN', 'USER']}>
       <PageTemplate loading={loading}>
-          <GenericForm
-            data={appointment}
-            loading={loading}
-            error={error}
-            handleChange={handleChange}
-            handleSubmit={handleSubmit}
-            fields={fields}
-            title="Añadir Nueva Cita"
-          />
+        <GenericForm
+          data={appointment}
+          loading={loading}
+          error={error}
+          handleChange={handleChange}
+          handleSubmit={handleSubmit}
+          fields={fields}
+          title="Añadir Nueva Cita"
+        />
       </PageTemplate>
     </ProtectedRoute>
   );

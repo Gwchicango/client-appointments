@@ -15,7 +15,7 @@ const GenericForm = <T,>({ data, loading, error, handleChange, handleSubmit, fie
   const router = useRouter();
 
   const handleCancel = () => {
-    router.back();
+    router.back(); // Navega a la página anterior
   };
 
   return (
@@ -36,6 +36,9 @@ const GenericForm = <T,>({ data, loading, error, handleChange, handleSubmit, fie
                   className="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all shadow-sm hover:shadow-md"
                   required
                 >
+                  <option value="" disabled>
+                    Seleccione una opción
+                  </option>
                   {field.options?.map((option) => (
                     <option key={option.value} value={option.value}>
                       {option.label}

@@ -12,8 +12,8 @@ export interface Appointment {
 }
 
 export interface AppointmentPost {
-  idPatient: number;
-  idDoctor: number;
+  idPatient: number | null;
+  idDoctor: number | null;
   date: string;
   time: string;
   status?: string;

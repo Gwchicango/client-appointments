@@ -19,6 +19,17 @@ const DashboardPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<string>("doctors");
 
   useEffect(() => {
+    // Verificar si la página ya se ha recargado
+    const hasReloaded = sessionStorage.getItem('hasReloaded');
+    if (!hasReloaded) {
+      // Marcar que la página se ha recargado
+      sessionStorage.setItem('hasReloaded', 'true');
+      // Recargar la página
+      window.location.reload();
+    }
+  }, []);
+
+  useEffect(() => {
     const fetchData = async () => {
       try {
         const [doctorResponse, clientResponse, appointmentResponse] = await Promise.all([

@@ -39,7 +39,7 @@ const AppointmentListPage: React.FC = () => {
 
         if (appointmentResponse.status === 200 && appointmentResponse.data) {
           let fetchedAppointments = appointmentResponse.data;
-          if (role === 'ADMIN') {
+          if (role === 'USER') {
             fetchedAppointments = fetchedAppointments.filter((appointment: Appointment) => appointment.idPatient === userId);
           }
           setAppointments(fetchedAppointments);
@@ -135,9 +135,11 @@ const AppointmentListPage: React.FC = () => {
               <h2 className="text-2xl font-bold">Lista de Citas</h2>
               <p>Aquí puedes encontrar una lista de todas las citas registradas en el sistema.</p>
             </div>
+            {role === 'ADMIN' && (
               <Link href="appointments/create" className="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors">
                 Añadir Nueva Cita
               </Link>
+            )}
           </div>
         </div>
         <div className="bg-white p-6 rounded-lg shadow-lg">
@@ -145,19 +147,23 @@ const AppointmentListPage: React.FC = () => {
             data={data}
             columns={columns}
             actions={(appointment) => (
-              <>
-                <Link href={`appointments/edit/${appointment.id}`}>
-                  <span className="bg-yellow-500 text-white py-1 px-2 rounded-lg hover:bg-yellow-600 transition-colors cursor-pointer">
-                    Editar
-                  </span>
-                </Link>
-                <button
-                  onClick={() => openModal(appointment.id)}
-                  className="bg-red-500 text-white py-1 px-2 rounded-lg hover:bg-red-600 transition-colors ml-2"
-                >
-                  Cancelar
-                </button>
-              </>
+              <div>
+                {role === 'ADMIN' && (
+                  <>
+                    <Link href={`appointments/edit/${appointment.id}`}>
+                      <span className="bg-yellow-500 text-white py-1 px-2 rounded-lg hover:bg-yellow-600 transition-colors cursor-pointer">
+                        Editar
+                      </span>
+                    </Link>
+                    <button
+                      onClick={() => openModal(appointment.id)}
+                      className="bg-red-500 text-white py-1 px-2 rounded-lg hover:bg-red-600 transition-colors ml-2"
+                    >
+                      Cancelar
+                    </button>
+                  </>
+                )}
+              </div>
             )}
           />
         </div>
