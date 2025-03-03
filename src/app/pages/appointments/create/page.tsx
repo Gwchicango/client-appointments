@@ -32,7 +32,9 @@ const CreateAppointmentPage: React.FC = () => {
         ]);
 
         if (doctorResponse.status === 200 && doctorResponse.data) {
-          setDoctors(doctorResponse.data);
+          // Filtra los doctores que están ocupados
+          const availableDoctors = doctorResponse.data.filter((doctor: Doctor) => doctor.availability !== 'BUSY');
+          setDoctors(availableDoctors);
         } else {
           setError(doctorResponse.statusText);
         }
