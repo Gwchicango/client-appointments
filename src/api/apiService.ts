@@ -2,10 +2,10 @@
 
 import axios from "axios";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
+const NEXT_PUBLIC_API_URL = process.env.NEXT_PUBLIC_API_URL || "http://172.172.141.223:8095/"; ;
 
-if (!API_URL) {
-  throw new Error("La variable de entorno API_URL no está definida");
+if (!NEXT_PUBLIC_API_URL) {
+  throw new Error("La variable de entorno NEXT_PUBLIC_API_URL no está definida");
 }
 
 interface ApiResponse<T> {
@@ -21,7 +21,7 @@ interface ApiError {
 }
 
 const axiosInstance = axios.create({
-  baseURL: API_URL,
+  baseURL: NEXT_PUBLIC_API_URL,
 });
 
 /**
@@ -43,12 +43,6 @@ const addAuthInterceptor = (instance: any) => {
 
 addAuthInterceptor(axiosInstance);
 
-// Método para redirigir al login y borrar el token del localStorage
-const redirectToLogin = () => {
-  //localStorage.removeItem("access_token");
-  localStorage.removeItem("role");
-  //window.location.href = "/auth/login";
-};
 
 /**
  * Servicio API para realizar solicitudes HTTP.
@@ -65,7 +59,6 @@ const createApiService = (instance: any) => ({
     } catch (error) {
       const axiosError = error as any;
       if (axiosError.response?.status === 401) {
-        redirectToLogin();
         return {
           data: null,
           status: 401,
@@ -99,7 +92,6 @@ const createApiService = (instance: any) => ({
     } catch (error) {
       const axiosError = error as any;
       if (axiosError.response?.status === 401) {
-        redirectToLogin();
         return {
           data: null,
           status: 401,
@@ -133,7 +125,6 @@ const createApiService = (instance: any) => ({
     } catch (error) {
       const axiosError = error as any;
       if (axiosError.response?.status === 401) {
-        redirectToLogin();
         return {
           data: null,
           status: 401,
@@ -167,7 +158,6 @@ const createApiService = (instance: any) => ({
     } catch (error) {
       const axiosError = error as any;
       if (axiosError.response?.status === 401) {
-        redirectToLogin();
         return {
           data: null,
           status: 401,
@@ -201,7 +191,6 @@ const createApiService = (instance: any) => ({
     } catch (error) {
       const axiosError = error as any;
       if (axiosError.response?.status === 401) {
-        redirectToLogin();
         return {
           data: null,
           status: 401,

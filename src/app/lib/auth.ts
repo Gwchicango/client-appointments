@@ -1,4 +1,4 @@
-import keycloak from "./keycloakConfig";
+import keycloak from "@/app/(components)/keycloakConfig";
 
 export function getToken() {
   return keycloak.token;

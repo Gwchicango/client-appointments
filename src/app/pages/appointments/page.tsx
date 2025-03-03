@@ -18,11 +18,17 @@ const AppointmentListPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [selectedAppointmentId, setSelectedAppointmentId] = useState<number | null>(null);
-  const role = localStorage.getItem('role');
-  const userId = Number(localStorage.getItem('idUser'));
+  const [role, setRole] = useState<string | null>(null);
+  const [userId, setUserId] = useState<number | null>(null);
 
   useEffect(() => {
-    console.log("Fetching data... appoiments");
+    if (typeof window !== 'undefined') {
+      setRole(localStorage.getItem('user_role'));
+      setUserId(Number(localStorage.getItem('idUser')));
+    }
+  }, []);
+
+  useEffect(() => {
     const fetchData = async () => {
       try {
         const [appointmentResponse, doctorResponse, clientResponse] = await Promise.all([
@@ -59,7 +65,9 @@ const AppointmentListPage: React.FC = () => {
       }
     };
 
-    fetchData();
+    if (role && userId !== null) {
+      fetchData();
+    }
   }, [role, userId]);
 
   const handleDelete = async (id: number) => {

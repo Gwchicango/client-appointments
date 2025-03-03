@@ -8,57 +8,83 @@ interface AuthContextProps {
   token: string | null;
   setToken: (token: string | null) => void;
   requestNewToken: (newOrgId?: number | null) => Promise<void>;
+  loading: boolean;
 }
 
-// Obtener el token inicial del localStorage
 const initialToken =
   typeof window !== "undefined" ? localStorage.getItem("access_token") : null;
 
-// Crear el contexto de autenticación con el valor inicial del token
 const AuthContext = createContext<AuthContextProps>({
   token: initialToken,
-  
   setToken: () => {},
   requestNewToken: () => Promise.resolve(),
+  loading: true,
 });
 
-/**
- * El componente AuthProvider proporciona el contexto de autenticación a sus componentes hijos.
- * Administra el estado del token de autenticación y lo almacena en localStorage.
- * @param children - Los componentes hijos que tendrán acceso al contexto de autenticación.
- */
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
-  const router = useRouter(); // Verificar si estamos en el cliente
+  const router = useRouter();
   const [token, setToken] = useState<string | null>(initialToken);
+  const [loading, setLoading] = useState<boolean>(true);
 
-  // Efecto para manejar cambios en el token en localStorage desde otras pestañas/ventanas
   useEffect(() => {
-    if (!token) {
-      return;
-    }
-    const decodedToken: { exp: number; iat: number; resource_access: { [key: string]: { roles: string[] } } } = jwtDecode(token);
+    const handleTokenChange = (newToken: string | null) => {
+      if (!newToken) {
+        setLoading(false);
+        return;
+      }
 
-    // Guardar el token y el rol en localStorage
-    localStorage.setItem("access_token", token ?? "");
-    const roles = decodedToken.resource_access?.CimedClient?.roles || [];
-    if (roles.length > 0) {
-      localStorage.setItem("user_role", roles[0]); // Guardar el primer rol encontrado
-    }
-    console.log("roles", roles[0]);
-    console.log(decodedToken);
+      try {
+        const decodedToken: {
+          exp: number;
+          iat: number;
+          resource_access?: {
+            [key: string]: { roles: string[] };
+          };
+        } = jwtDecode(newToken);
+
+        console.log("Token decodificado:", decodedToken); // Depuración
+
+        // Verificar si el token ha expirado
+        const currentTime = Date.now() / 1000;
+        if (decodedToken.exp < currentTime) {
+          console.warn("El token ha expirado.");
+          //localStorage.removeItem("access_token");
+          //localStorage.removeItem("user_role");
+          setToken(null);
+          router.push("/auth/login");
+          return;
+        }
+
+        // Guardar el token en localStorage
+        localStorage.setItem("access_token", newToken ?? "");
+
+        // Extraer roles del token
+        const clientRoles = decodedToken.resource_access?.["CimedClient"]?.roles || [];
+        if (clientRoles.length > 0) {
+          localStorage.setItem("user_role", clientRoles[0]); // Guardar el primer rol encontrado
+          console.log("Rol del usuario:", clientRoles[0]); // Depuración
+        } else {
+          console.warn("No se encontraron roles en el token.");
+        }
+      } catch (error) {
+        console.error("Error decodificando el token:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    handleTokenChange(token);
   }, [token, router]);
 
   return (
-    <AuthContext.Provider value={{ token, setToken, requestNewToken: async () => {} }}>
+    <AuthContext.Provider
+      value={{ token, setToken, requestNewToken: async () => {}, loading }}
+    >
       {children}
     </AuthContext.Provider>
   );
 };
 
-/**
- * Hook personalizado para acceder al contexto de autenticación.
- * @returns El contexto de autenticación.
- */
 export const useAuth = () => React.useContext(AuthContext);

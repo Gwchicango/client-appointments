@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import PageTemplate from '@/app/(components)/PageTemplate';
+import { FaUsers, FaCalendarAlt, FaUserMd } from 'react-icons/fa';
 import { doctorApi, Doctor } from '@/app/pages/doctor/doctorApi';
 import { userApi, User } from '@/app/pages/client/clientApi';
 import { appointmentApi, Appointment } from '@/app/pages/appointments/appointmentsApi';
@@ -18,7 +19,6 @@ const DashboardPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<string>("doctors");
 
   useEffect(() => {
-    console.log('Fetching data...');
     const fetchData = async () => {
       try {
         const [doctorResponse, clientResponse, appointmentResponse] = await Promise.all([
@@ -52,7 +52,7 @@ const DashboardPage: React.FC = () => {
     };
 
     fetchData();
-  }, []); // Dependencias vacías para ejecutar solo una vez
+  }, []);
 
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(event.target.value);

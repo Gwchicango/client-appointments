@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/app/(context)/AuthContext"; // Importa el contexto de autenticación
 
 interface TokenData {
   access_token: string;
@@ -17,16 +18,17 @@ interface ErrorResponse {
   error_description: string;
 }
 
+
 const authenticateUser = async (username: string, password: string): Promise<TokenData> => {
   const params = new URLSearchParams();
-  params.append("grant_type", "password");
-  params.append("client_id", "CimedClient");
-  params.append("client_secret", "LX3PKkMRtPaE0c6oXoAdvm3w1H1PJiAI");
+  params.append("grant_type", process.env.NEXT_PUBLIC_GRANT_TYPE || "password");
+  params.append("client_id", process.env.NEXT_PUBLIC_CLIENT_ID || "CimedClient");
+  params.append("client_secret", process.env.NEXT_PUBLIC_CLIENT_SECRET || "LX3PKkMRtPaE0c6oXoAdvm3w1H1PJiAI");
   params.append("username", username);
   params.append("password", password);
-  params.append("scope", "openid");
+  params.append("scope", process.env.NEXT_PUBLIC_SCOPE || "openid");
 
-  const response = await fetch("http://172.172.141.223:8040/realms/CimedRealm/protocol/openid-connect/token", {
+  const response = await fetch(process.env.NEXT_PUBLIC_TOKEN_URL || "http://172.172.141.223:8040/realms/CimedRealm/protocol/openid-connect/token", {
     method: "POST",
     headers: {
       "Content-Type": "application/x-www-form-urlencoded",
@@ -59,6 +61,7 @@ export default function Login() {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+  const { setToken } = useAuth(); // Usa el contexto de autenticación
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -67,10 +70,9 @@ export default function Login() {
 
     try {
       const tokenData: TokenData = await authenticateUser(email, password);
-      console.log("Token recibido:", tokenData);
-
       // Guarda el token en el almacenamiento local
       localStorage.setItem("access_token", tokenData.access_token);
+      setToken(tokenData.access_token); // Actualiza el estado del token en el contexto
 
       // Redirige al usuario al dashboard
       router.push("/pages/dashboard");
