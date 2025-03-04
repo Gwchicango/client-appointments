@@ -125,7 +125,7 @@ const AppointmentListPage: React.FC = () => {
   console.log('data:', data);
 
   return (
-    <ProtectedRoute allowedRoles={['ADMIN', 'USER']}>
+    <ProtectedRoute allowedRoles={['admin', 'user']}>
       <PageTemplate loading={loading}>
         <div className="bg-white p-6 rounded-lg shadow-lg mb-6">
           <div className="flex justify-between items-center mb-4">
@@ -133,7 +133,7 @@ const AppointmentListPage: React.FC = () => {
               <h2 className="text-2xl font-bold">Lista de Citas</h2>
               <p>Aquí puedes encontrar una lista de todas las citas registradas en el sistema.</p>
             </div>
-            {role === 'USER' && (
+            {role === 'user' && (
               <Link href="appointments/create" className="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors">
                 Añadir Nueva Cita
               </Link>
@@ -144,7 +144,7 @@ const AppointmentListPage: React.FC = () => {
           <GenericTable
             data={data}
             columns={columns}
-            actions={role === 'ADMIN' ? (appointment) => (
+            actions={role === 'admin' ? (appointment) => (
               <>
                 <Link href={`appointments/edit/${appointment.id}`}>
                   <span className="bg-yellow-500 text-white py-1 px-2 rounded-lg hover:bg-yellow-600 transition-colors cursor-pointer">

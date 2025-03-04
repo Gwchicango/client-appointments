@@ -128,7 +128,7 @@ const CreateAppointmentPage: React.FC = () => {
   ];
 
   return (
-    <ProtectedRoute allowedRoles={['ADMIN', 'USER']}>
+    <ProtectedRoute allowedRoles={['admin', 'user']}>
       <PageTemplate loading={loading}>
         <GenericForm
           data={appointment}

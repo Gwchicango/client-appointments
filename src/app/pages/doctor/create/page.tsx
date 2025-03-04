@@ -69,7 +69,7 @@ const CreateDoctorPage: React.FC = () => {
   ];
 
   return (
-    <ProtectedRoute allowedRoles={['ADMIN'] }>
+    <ProtectedRoute allowedRoles={['admin'] }>
       <PageTemplate loading={loading}>
         <GenericForm
           data={doctor}

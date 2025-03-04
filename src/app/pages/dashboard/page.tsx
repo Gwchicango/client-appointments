@@ -114,7 +114,7 @@ const DashboardPage: React.FC = () => {
   ];
 
   return (
-    <ProtectedRoute allowedRoles={['ADMIN','USER']}>
+    <ProtectedRoute allowedRoles={['admin','user']}>
       <PageTemplate loading={loading}>
         <div className="bg-white p-6 rounded-lg shadow-lg mb-6">
           <h2 className="text-2xl font-bold mb-4">¡Bienvenido al Panel de Control!</h2>

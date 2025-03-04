@@ -85,7 +85,7 @@ const ClientListPage: React.FC = () => {
   ];
 
   return (
-    <ProtectedRoute allowedRoles={['ADMIN', 'USER']}>
+    <ProtectedRoute allowedRoles={['admin', 'user']}>
       <PageTemplate loading={loading}>
         <div className="bg-white p-6 rounded-lg shadow-lg mb-6">
           <div className="flex justify-between items-center mb-4">
@@ -109,7 +109,7 @@ const ClientListPage: React.FC = () => {
                     Editar
                   </span>
                 </Link>
-                {role === 'ADMIN' && (
+                {role === 'admin' && (
                   <button
                     onClick={() => openModal(client.id)}
                     className="bg-red-500 text-white py-1 px-2 rounded-lg hover:bg-red-600 transition-colors"

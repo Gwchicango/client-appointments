@@ -23,7 +23,7 @@ const authenticateUser = async (username: string, password: string): Promise<Tok
   const params = new URLSearchParams();
   params.append("grant_type", process.env.NEXT_PUBLIC_GRANT_TYPE || "password");
   params.append("client_id", process.env.NEXT_PUBLIC_CLIENT_ID || "CimedClient");
-  params.append("client_secret", process.env.NEXT_PUBLIC_CLIENT_SECRET || "LX3PKkMRtPaE0c6oXoAdvm3w1H1PJiAI");
+  params.append("client_secret", process.env.NEXT_PUBLIC_CLIENT_SECRET || "Pys0RdtC11sGfT6JlqvMUOn39rWEpEBQ");
   params.append("username", username);
   params.append("password", password);
   params.append("scope", process.env.NEXT_PUBLIC_SCOPE || "openid");

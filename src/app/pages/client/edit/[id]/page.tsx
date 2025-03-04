@@ -90,7 +90,7 @@ const EditClientPage: React.FC = () => {
     { name: 'username', label: 'Nombre de Usuario', type: 'text' },
     { name: 'password', label: 'Contraseña', type: 'password' },
     { name: 'role', label: 'Rol', type: 'select', options: [
-      { value: 'ADMIN', label: 'Admin' },
+      { value: 'admin', label: 'Admin' },
       { value: 'PATIENT', label: 'Paciente' },
     ] },
     { name: 'phone', label: 'Teléfono', type: 'text' },
@@ -99,7 +99,7 @@ const EditClientPage: React.FC = () => {
   ];
 
   return (
-    <ProtectedRoute allowedRoles={['ADMIN']}>
+    <ProtectedRoute allowedRoles={['admin']}>
       <PageTemplate loading={loading}>
         <div className="bg-white p-6 rounded-lg shadow-lg mb-6">
           <h2 className="text-2xl font-bold mb-4">Editar Cliente</h2>

@@ -8,7 +8,7 @@ const getAdminToken = async () => {
   const params = new URLSearchParams();
   params.append("grant_type", "client_credentials"); // Flujo de client_credentials
   params.append("client_id", "CimedClient"); // ID del cliente
-  params.append("client_secret", "LX3PKkMRtPaE0c6oXoAdvm3w1H1PJiAI"); // Client secret
+  params.append("client_secret", "Pys0RdtC11sGfT6JlqvMUOn39rWEpEBQ"); // Client secret
 
   const response = await fetch(
     "http://172.172.141.223:8040/realms/CimedRealm/protocol/openid-connect/token", // Endpoint de token
