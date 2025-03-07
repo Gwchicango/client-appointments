@@ -93,32 +93,32 @@ const ClientListPage: React.FC = () => {
               <h2 className="text-2xl font-bold">Lista de Clientes</h2>
               <p>Aquí puedes encontrar una lista de todos los clientes registrados en el sistema.</p>
             </div>
-            <Link href="client/create" className="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors">
-              Añadir Nuevo Cliente
-            </Link>
+            {role === 'admin' && (
+              <Link href="client/create" className="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors">
+                Añadir Nuevo Paciente
+              </Link>
+            )}
           </div>
         </div>
         <div className="bg-white p-6 rounded-lg shadow-lg">
           <GenericTable
             data={clients}
             columns={columns}
-            actions={(client) => (
+            actions={role === 'admin' ? (client) => (
               <>
                 <Link href={`client/edit/${client.id}`}>
                   <span className="bg-yellow-500 text-white py-1 px-2 rounded-lg hover:bg-yellow-600 transition-colors cursor-pointer">
                     Editar
                   </span>
                 </Link>
-                {role === 'admin' && (
-                  <button
-                    onClick={() => openModal(client.id)}
-                    className="bg-red-500 text-white py-1 px-2 rounded-lg hover:bg-red-600 transition-colors"
-                  >
-                    Eliminar
-                  </button>
-                )}
+                <button
+                  onClick={() => openModal(client.id)}
+                  className="bg-red-500 text-white py-1 px-2 rounded-lg hover:bg-red-600 transition-colors ml-2"
+                >
+                  Eliminar
+                </button>
               </>
-            )}
+            ) : undefined}
           />
         </div>
         <ConfirmModal

@@ -18,7 +18,6 @@ interface ErrorResponse {
   error_description: string;
 }
 
-
 const authenticateUser = async (username: string, password: string): Promise<TokenData> => {
   const params = new URLSearchParams();
   params.append("grant_type", process.env.NEXT_PUBLIC_GRANT_TYPE || "password");
@@ -50,7 +49,7 @@ const authenticateUser = async (username: string, password: string): Promise<Tok
       const error: ErrorResponse = JSON.parse(errorText);
       throw new Error(error.error_description || "Error al autenticar");
     } catch (e) {
-      throw new Error("Error al autenticar: " + errorText);
+      throw new Error("Error al autenticar");
     }
   }
 };
@@ -77,8 +76,11 @@ export default function Login() {
       // Redirige al usuario al dashboard
       router.push("/pages/dashboard");
     } catch (error) {
-      setError("Error al iniciar sesión. Verifica tus credenciales.");
-      console.error("Error:", error);
+      if (error instanceof Error) {
+        setError(error.message);
+      } else {
+        setError("Error al iniciar sesión. Verifica tus credenciales.");
+      }
     } finally {
       setIsLoading(false);
     }
@@ -122,12 +124,6 @@ export default function Login() {
               {isLoading ? "Cargando..." : "Iniciar Sesión"}
             </button>
           </form>
-          <p className="mt-4 text-center text-black">
-            ¿No tienes una cuenta?{" "}
-            <Link href="/auth/register" className="text-blue-600 hover:underline">
-              Regístrate
-            </Link>
-          </p>
         </div>
       </div>
     </div>

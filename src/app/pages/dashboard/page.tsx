@@ -69,6 +69,16 @@ const DashboardPage: React.FC = () => {
     setSearchTerm(event.target.value);
   };
 
+  const getDoctorName = (id: number) => {
+    const doctor = doctors.find(doc => doc.id === id);
+    return doctor ? `${doctor.name} ${doctor.lastname}` : 'Desconocido';
+  };
+
+  const getClientName = (id: number) => {
+    const client = clients.find(cli => cli.id === id);
+    return client ? `${client.name} ${client.lastname}` : 'Desconocido';
+  };
+
   const filteredDoctors = doctors.filter(doctor =>
     doctor.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     doctor.lastname.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -81,9 +91,13 @@ const DashboardPage: React.FC = () => {
     client.email.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const filteredAppointments = appointments.filter(appointment =>
-    appointment.idPatient.toString().includes(searchTerm.toLowerCase()) ||
-    appointment.idDoctor.toString().includes(searchTerm.toLowerCase()) ||
+  const filteredAppointments = appointments.map(appointment => ({
+    ...appointment,
+    idPatient: getClientName(appointment.idPatient),
+    idDoctor: getDoctorName(appointment.idDoctor),
+  })).filter(appointment =>
+    appointment.idPatient.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    appointment.idDoctor.toLowerCase().includes(searchTerm.toLowerCase()) ||
     appointment.date.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -93,7 +107,7 @@ const DashboardPage: React.FC = () => {
     { key: 'lastname', label: 'Apellido' },
     { key: 'email', label: 'Correo Electrónico' },
     { key: 'phone', label: 'Teléfono' },
-    { key: 'specialty', label: 'Especialidad' },
+    { key: 'speciality', label: 'Especialidad' },
   ];
 
   const clientColumns: { key: keyof User; label: string }[] = [
@@ -104,7 +118,7 @@ const DashboardPage: React.FC = () => {
     { key: 'phone', label: 'Teléfono' },
   ];
 
-  const appointmentColumns: { key: keyof Appointment; label: string }[] = [
+  const appointmentColumns: { key: keyof Appointment | 'idPatient' | 'idDoctor'; label: string }[] = [
     { key: 'id', label: 'ID' },
     { key: 'idPatient', label: 'Paciente' },
     { key: 'idDoctor', label: 'Doctor' },
@@ -132,7 +146,7 @@ const DashboardPage: React.FC = () => {
               className={`px-4 py-2 rounded-lg ${activeTab === 'clients' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
               onClick={() => setActiveTab('clients')}
             >
-              Clientes
+              Pacientes
             </button>
             <button
               className={`px-4 py-2 rounded-lg ${activeTab === 'appointments' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}

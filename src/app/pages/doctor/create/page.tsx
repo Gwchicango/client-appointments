@@ -13,7 +13,7 @@ const CreateDoctorPage: React.FC = () => {
     lastname: '',
     email: '',
     phone: '',
-    specialty: '',
+    speciality: '',
     availability: 'AVAILABLE',
   });
   const [loading, setLoading] = useState<boolean>(false);
@@ -56,7 +56,7 @@ const CreateDoctorPage: React.FC = () => {
     { name: 'lastname', label: 'Apellido', type: 'text' },
     { name: 'email', label: 'Correo Electrónico', type: 'email' },
     { name: 'phone', label: 'Teléfono', type: 'text' },
-    { name: 'specialty', label: 'Especialidad', type: 'text' },
+    { name: 'speciality', label: 'Especialidad', type: 'text' },
     {
       name: 'availability',
       label: 'Disponibilidad',

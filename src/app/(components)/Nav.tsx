@@ -52,7 +52,7 @@ const Nav: React.FC = () => {
                         <li className="mb-4">
                             <Link href="/pages/client" className="flex items-center p-2 rounded-lg hover:bg-blue-700 transition-colors">
                                 <FaUsers className="mr-3 text-xl" />
-                                <span className="text-lg">Clientes</span>
+                                <span className="text-lg">Pacientes</span>
                             </Link>
                         </li>
                     )}

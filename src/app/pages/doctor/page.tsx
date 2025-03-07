@@ -72,7 +72,7 @@ const DoctorListPage: React.FC = () => {
     { key: 'lastname', label: 'Apellido' },
     { key: 'email', label: 'Correo Electrónico' },
     { key: 'phone', label: 'Teléfono' },
-    { key: 'specialty', label: 'Especialidad' },
+    { key: 'speciality', label: 'Especialidad' },
     { key: 'availability', label: 'Disponibilidad' },
     //{ key: 'createdAt', label: 'Creado el' },
   ];
